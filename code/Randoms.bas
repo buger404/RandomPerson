@@ -26,6 +26,7 @@ Public Sub Start()
     
     '创建语音对象
     Set Voice = CreateObject("SAPI.SpVoice")
+    Voice.Volume = 100
 End Sub
 Public Sub StartRandom()
     '摇号准备
@@ -50,7 +51,7 @@ Miss:
     Index = Int(Rnd * UBound(Sticks) + 1)
     '防止下标越界
     If Index > UBound(Sticks) Then Index = UBound(Sticks)
-    RIndex = Sticks(Index)
+    RIndex = Sticks(Index) - 1
     
     If Rnd < Val(Student(2, RIndex)) Then
         '闪避成功
