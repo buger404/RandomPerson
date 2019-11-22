@@ -1,7 +1,7 @@
 GPage = 0, 0, 0, 0, C
 Gdiplus = 0, 0, 0, 0, C
 Bass = 0, 0, 0, 0, C
-GCore = 0, 0, 0, 0, C
+GCore = 192, 192, 1085, 588, 
 GMan = 0, 0, 0, 0, C
 GFont = 0, 0, 0, 0, C
 GMusic = 0, 0, 0, 0, C
@@ -24,3 +24,4 @@ GCrashBox = 0, 0, 0, 0, C
 ResPool = 0, 0, 0, 0, C
 GameWindow = 96, 96, 989, 492, Z, 64, 64, 957, 460, C
 MainPage = 128, 128, 1021, 524, 
+Randoms = 128, 128, 1021, 524, 
