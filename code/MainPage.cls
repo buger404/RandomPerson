@@ -40,7 +40,7 @@ Public Sub Update()
                 For j = 1 To 3
                     If GetTickCount - ClickTime >= 1000 + j * 333 Then
                         Name = Name & Mid(Student(0, RIndex), j, 1)
-                        If Not Beeps(j) Then Beeps(j) = True: win32api.Beep 800 + j * 400, 200
+                       ' If Not Beeps(j) Then Beeps(j) = True: win32api.Beep 800 + j * 400, 200
                     Else
                         Name = Name & "£¿"
                     End If
