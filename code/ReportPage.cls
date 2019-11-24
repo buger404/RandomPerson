@@ -1,0 +1,98 @@
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+  Persistable = 0  'NotPersistable
+  DataBindingBehavior = 0  'vbNone
+  DataSourceBehavior  = 0  'vbNone
+  MTSTransactionMode  = 0  'NotAnMTSObject
+END
+Attribute VB_Name = "ReportPage"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = True
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+'======================================
+'   页面绘制器
+    Dim Page As GPage
+'======================================
+
+Public Sub Update()
+    '游戏每一帧的过程（绘制过程请放在此处）
+    
+    Page.Clear argb(255, 0, 0, 0) '清空画布
+
+    '================================================================
+    '   示例：绘制文字
+    '   Page.Writes "我是文字", 20,20, Color:=argb(255, 0, 0, 0)
+    '================================================================
+    
+    Page.Writes "摇号统计", RGW / 2, 70, 48, argb(255, 255, 255, 255), align:=StringAlignmentCenter
+    Page.Writes "绝对公平公正", RGW / 2, 140, 28, argb(150, 255, 255, 255), align:=StringAlignmentCenter
+    
+    Dim pro As Single
+
+    pro = (GetTickCount - ReportTime) / 2000
+    pro = Cubic(pro, 0, 1, 1, 1)
+    
+    If pro > 1 Then
+        pro = 1
+    End If
+    
+    Dim Max As Single, Pitch As Single
+    For I = 1 To 62
+        If RCount(I) > Max Then Max = RCount(I)
+        Pitch = (Pitch + RCount(I)) / 2
+    Next
+    
+    Dim W As Long
+    W = Int(RGW / 62)
+    Pitch = Pitch * pro
+    
+    For I = 1 To 62
+        Page.Paint 0, W * (I - 1), RGH - 200, W + 1, RCount(I) * pro / Max * (RGH / 2), argb(RCount(I) * pro / Max * 255, 51, 203, 186), pos:=posOnBottom
+        Page.Writes Student(0, I - 1), W * (I - 1), RGH - 200, 24, argb(RCount(I) * pro / Max * 255, 255, 255, 255), W + 1, 200, StringAlignmentCenter, FontStyleBold
+        Page.Writes Int(RCount(I) * pro), W * (I - 1), RGH - 200 - RCount(I) / Max * (RGH / 2) * pro - 30, 16, argb(255, 255, 255, 255), W + 1, 30, align:=StringAlignmentCenter, style:=FontStyleBold
+    Next
+    Page.Paint 0, 0, RGH - 200 - Pitch / Max * (RGH / 2), RGW + 1, 10, argb(100, 255, 255, 255)
+    Page.Writes "平均" & Int(Pitch) & "次", RGW / 2, RGH - 200 - Pitch / Max * (RGH / 2) + 10, 24, argb(255, 255, 255, 255), align:=StringAlignmentCenter
+    
+    If Mouse.state = 2 Then ECore.NewTransform , , "MainPage"
+End Sub
+Public Sub Wheel(Direction As Integer, Depth As Single)
+    '鼠标滚轮事件
+    'Direction:方向，Depth：深度
+End Sub
+Public Sub AnimationMsg(id As String, msg As String)
+    '动画消息接收
+End Sub
+Public Sub Enter()
+    '页面进入事件
+    ReportTime = GetTickCount
+End Sub
+Public Sub Leave()
+    '页面离开事件
+End Sub
+Public Sub Gotfocus()
+    '窗口取得焦点事件
+End Sub
+Public Sub Lostfocus()
+    '窗口失去焦点事件
+End Sub
+Public Sub AnimationDone(id As Integer)
+    '动画播放结束事件
+    'id：结束的动画ID
+End Sub
+Private Sub Class_Initialize()
+    '创建页面绘制器
+    Set Page = New GPage
+    Page.Create Me
+    '导入游戏资源
+    Page.Res.NewImages App.path & "\assets"
+    '创建页面
+    ECore.Add Page, "ReportPage"
+    
+    '===============================================
+    '   如果需要添加动画，请放置在此处
+    
+    '===============================================
+End Sub

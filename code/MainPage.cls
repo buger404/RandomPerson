@@ -15,8 +15,10 @@ Attribute VB_Exposed = False
 '   页面绘制器
     Dim Page As GPage
     Dim Clicked As Boolean, ClickTime As Long
-    Dim Beeps(3) As Boolean
     Dim Touched As Boolean
+    Dim RandomStyle As Integer
+    Dim RandomPerson As Integer
+    Dim RandomMax As Integer
 '======================================
 
 Public Sub Update()
@@ -29,46 +31,62 @@ Public Sub Update()
     '   示例：绘制文字
     '   Page.Writes "我是文字", 20,20, Color:=argb(255, 0, 0, 0)
     '================================================================
-    Page.Writes "高一五班专属摇号机", RGW / 2 - 100 + 2, 60, 18, argb(100, 0, 0, 0)
-    If Index <> -1 Then
-        Page.Writes "号数 " & Student(1, RIndex), RGW / 2 - 100, RGH / 2 - 48 * 2.5 + 75, 24, argb(150, 0, 0, 0)
-        If Clicked Then
-            Dim Name As String, j As Integer
-            If GetTickCount - ClickTime <= 1000 Then
-                Name = "？？？"
-            Else
-                For j = 1 To 3
-                    If GetTickCount - ClickTime >= 1000 + j * 333 Then
-                        Name = Name & Mid(Student(0, RIndex), j, 1)
-                       ' If Not Beeps(j) Then Beeps(j) = True: win32api.Beep 800 + j * 400, 200
-                    Else
-                        Name = Name & "？"
-                    End If
-                Next
-            End If
-            Page.Writes "幸运小朋友 " & Name, RGW / 2 - 100 - 3, RGH / 2 - 48 * 1.8 + 75, 36, argb(255, 32, 32, 32)
-        Else
-            Page.Writes "幸运小朋友 " & Student(0, RIndex), RGW / 2 - 100 - 3, RGH / 2 - 48 * 1.8 + 75, 36, argb(255, 32, 32, 32)
-        End If
+    Page.Writes "高一五班专属摇号机", RGW / 2, RGH / 2 - 90, 24, argb(255, 255, 255, 255), align:=StringAlignmentCenter
+    Page.Writes "Version 3.0.0", RGW / 2, RGH / 2 - 50, 18, argb(150, 255, 255, 255), align:=StringAlignmentCenter
+    
+    Page.Writes "摇号方式", RGW / 2 - 250, RGH / 2 + 50, 18, argb(255, 0, 0, 0)
+    Dim Ops(2) As String
+    Ops(0) = "默认": Ops(1) = "排除男生": Ops(2) = "排除女生"
+    For I = 0 To 2
+        Page.Paint 0, RGW / 2 - 250 + 120 + I * 120 + 50 - 2, RGH / 2 + 63, 100, 30, IIf(RandomStyle = I, argb(255, 51, 203, 186), argb(255, 232, 232, 232)), pos:=posOnCenter
+        If CheckMouse2 = mMouseUp Then RandomStyle = I
+        Page.Writes Ops(I), RGW / 2 - 250 + 120 + I * 120 + 50, RGH / 2 + 50, 18, IIf(RandomStyle = I, argb(255, 255, 255, 255), argb(255, 128, 128, 128)), align:=StringAlignmentCenter
+    Next
+    
+    Page.Writes "摇号人数", RGW / 2 - 250, RGH / 2 + 100, 18, argb(255, 0, 0, 0)
+    Page.Writes RandomPerson + 1, RGW / 2 - 100 + 9 + 4, RGH / 2 + 100, 18, argb(255, 51, 203, 186), align:=StringAlignmentCenter
+    Page.Paint 1, RGW / 2 - 140 + 4, RGH / 2 + 100 - 2, 30, 30, IIf(RandomPerson > 0, argb(255, 51, 203, 186), argb(255, 232, 232, 232))
+    If CheckMouse2 = mMouseUp And RandomPerson > 0 Then RandomPerson = RandomPerson - 1
+    Page.Writes "-", RGW / 2 - 140 + 8 + 4, RGH / 2 + 100, 18, IIf(RandomPerson > 0, argb(255, 255, 255, 255), argb(255, 32, 32, 32))
+    Page.Paint 1, RGW / 2 - 72 + 4, RGH / 2 + 100 - 2, 30, 30, IIf(RandomPerson < RandomMax - 1, argb(255, 51, 203, 186), argb(255, 232, 232, 232))
+    If CheckMouse2 = mMouseUp And RandomPerson < RandomMax - 1 Then RandomPerson = RandomPerson + 1
+    Page.Writes "+", RGW / 2 - 72 + 5 + 4, RGH / 2 + 100, 18, IIf(RandomPerson < RandomMax - 1, argb(255, 255, 255, 255), argb(255, 32, 32, 32))
+    
+    Page.Writes "只凭运气：" & IIf(JustRandom, "开", "关"), RGW / 2 + 98, RGH / 2 + 100, 18, IIf(JustRandom, argb(255, 51, 203, 186), argb(255, 0, 0, 0)), 150, 25
+    If CheckMouse2 = mMouseUp Then
+        MusicList.Play "Option.wav"
+        JustRandom = Not JustRandom
+    End If
+    Page.Writes "关闭音效：" & IIf(CloseSnd, "开", "关"), RGW / 2 + 98, RGH / 2 + 130, 18, IIf(CloseSnd, argb(255, 51, 203, 186), argb(255, 0, 0, 0)), 150, 25
+    If CheckMouse2 = mMouseUp Then
+        MusicList.Play "Option.wav"
+        CloseSnd = Not CloseSnd
     End If
     
-    If Clicked Then
-        If GetTickCount - ClickTime <= 1000 Then Call GetRandom
-        If GetTickCount - ClickTime >= 2000 Then
-            Call DoneRandom
-            Clicked = False
-        End If
+    Page.Writes "About", RGW / 2 - 280, RGH / 2 - 275, 18, argb(150, 255, 255, 255), 100, 25, StringAlignmentCenter
+    If CheckMouse2 = mMouseUp Then
+        MsgBox "高一五班专属摇号机" & vbCrLf & "版本号：3.0.0" & vbCrLf & vbCrLf & "Copyright 2019 CZY&LSM all rights reserved .", 48, "关于"
     End If
     
-    Page.DrawImage "close.png", RGW / 2, RGH - 40, alpha:=1, pos:=posOnCenter
-    If CheckMouse2 = mMouseUp Then GameWindow.WindowState = 1
+    Page.Writes "Hide", RGW / 2 + 185, RGH / 2 - 275, 18, argb(150, 255, 255, 255), 100, 25, StringAlignmentCenter
+    If CheckMouse2 = mMouseUp Then ECore.NewTransform transFadeIn, , "FlyPage"
     
-    If CheckMouse(0, 0, GW, GH) = mMouseUp Then
+    Page.Writes "Report", RGW / 2 + 105, RGH / 2 - 275, 18, argb(150, 255, 255, 255), 80, 25, StringAlignmentCenter
+    If CheckMouse2 = mMouseUp Then ECore.NewTransform transFadeIn, , "ReportPage"
+    
+    Page.DrawImage "go.png", RGW / 2, RGH / 2 + 200, alpha:=1, pos:=posOnCenter
+    If CheckMouse2 = mMouseUp Then
+        RandomTime = GetTickCount
         Erase Beeps
         Call StartRandom
         ClickTime = GetTickCount: Clicked = True
+        ReDim Person(RandomPerson)
+        For I = 0 To UBound(Person)
+            Person(I) = GetRandom(RandomStyle)
+        Next
+        ECore.NewTransform transFadeIn, , "PersonPage"
     End If
-    
+
 End Sub
 Public Sub Wheel(Direction As Integer, Depth As Single)
     '鼠标滚轮事件
@@ -98,10 +116,13 @@ Private Sub Class_Initialize()
     Set Page = New GPage
     Page.Create Me
     '导入游戏资源
-    Page.Res.NewImages App.path & "\assets", 0.65
+    Page.Res.NewImages App.path & "\assets", 0.75
     '创建页面
     ECore.Add Page, "MainPage"
-    
+    Dim WCount As Long, HCount As Long
+    WCount = Int(RGW / (400 + 50))
+    HCount = Int(RGH / (220 + 50))
+    RandomMax = WCount * HCount
     '===============================================
     '   如果需要添加动画，请放置在此处
     

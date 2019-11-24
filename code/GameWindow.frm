@@ -4,14 +4,15 @@ Begin VB.Form GameWindow
    BackColor       =   &H80000005&
    BorderStyle     =   0  'None
    Caption         =   "抽奖"
-   ClientHeight    =   6672
-   ClientLeft      =   12
-   ClientTop       =   12
+   ClientHeight    =   6675
+   ClientLeft      =   15
+   ClientTop       =   15
    ClientWidth     =   9660
    LinkTopic       =   "Form1"
-   ScaleHeight     =   556
+   ScaleHeight     =   445
    ScaleMode       =   3  'Pixel
-   ScaleWidth      =   805
+   ScaleWidth      =   644
+   ShowInTaskbar   =   0   'False
    StartUpPosition =   2  '屏幕中心
    Begin VB.Timer DrawTimer 
       Enabled         =   0   'False
@@ -31,6 +32,9 @@ Attribute VB_Exposed = False
 '==================================================
 '   在此处放置你的页面类模块声明
     Dim MainPage As MainPage
+    Dim FlyPage As FlyPage
+    Dim PersonPage As PersonPage
+    Dim ReportPage As ReportPage
 '==================================================
 
 Private Sub DrawTimer_Timer()
@@ -45,7 +49,7 @@ End Sub
 
 Private Sub Form_Load()
     '初始化Emerald（在此处可以修改窗口大小哟~）
-    StartEmerald Me.Hwnd, 805, 470
+    StartEmerald Me.Hwnd, Screen.Width / Screen.TwipsPerPixelX, Screen.Height / Screen.TwipsPerPixelY
     'ScaleGame 805 / 1326, ScaleSuitable
     '创建字体
     MakeFont "微软雅黑"
@@ -70,13 +74,18 @@ Private Sub Form_Load()
     '     Set TestPage = New TestPage
     '公共部分：Dim TestPage As TestPage
         Set MainPage = New MainPage
+        Set FlyPage = New FlyPage
+        Set PersonPage = New PersonPage
+        Set ReportPage = New ReportPage
     '=============================================
 
     '设置活动页面
-    EC.ActivePage = "MainPage"
+    EC.ActivePage = "FlyPage"
     
-    Student = ReadExcel(App.path & "\Person.xlsx")
+    SetWindowPos Me.Hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE Or SWP_NOSIZE
+    Student = ReadExcel(App.path & "\Person.xls")
     Call Start
+    Piano.Init
 End Sub
 
 Private Sub Form_MouseDown(button As Integer, Shift As Integer, X As Single, y As Single)
@@ -99,6 +108,7 @@ End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
     '终止绘制
+    Piano.Dispose
     DrawTimer.Enabled = False
     '释放Emerald资源
     EndEmerald

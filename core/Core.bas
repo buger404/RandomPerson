@@ -1,5 +1,6 @@
 Attribute VB_Name = "Core"
 Public MusicList As GMusicList
+Public Piano As New Piano
 Function ReadExcel(ByVal path As String, Optional ByVal SheetIndex As Integer = 1) As String()
     Dim App As Object, WBook As Object, WB As Object, Sheet As Object
 

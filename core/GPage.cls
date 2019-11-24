@@ -43,7 +43,7 @@ Public TopPage As Boolean
         Res.Add CDC, 0, ""
         PoolCreateFromHdc CDC, GG
         GdipSetSmoothingMode GG, SmoothingModeAntiAlias
-        GdipSetTextRenderingHint GG, TextRenderingHintAntiAlias
+        GdipSetTextRenderingHint GG, TextRenderingHintAntiAliasGridFit
         
         Set DrawBox = dBox
         
@@ -255,9 +255,9 @@ Public TopPage As Boolean
         
         If ScrollMode Then
             OX = OX + ScrollX + ScrollBX: OY = OY + ScrollY + ScrollBY
-            Dim ret As Long
-            GdipIsVisibleRect GG, OX - 1, OY - 1, ow, oh, ret
-            If Not ret Then OutOfScroll = True: Exit Sub
+            Dim Ret As Long
+            GdipIsVisibleRect GG, OX - 1, OY - 1, ow, oh, Ret
+            If Not Ret Then OutOfScroll = True: Exit Sub
         End If
         
         
@@ -303,7 +303,7 @@ Public TopPage As Boolean
             If Not IsMissing(cw) Then cw = cw * Scales
             If Not IsMissing(ch) Then ch = ch * Scales
         End If
-        Dim B As BLENDFUNCTION, index As Integer, bl As Long
+        Dim b As BLENDFUNCTION, index As Integer, bl As Long
         Dim OX As Long, OY As Long, ow As Long, oh As Long
         OX = X: OY = y: ow = w: oh = h
         Dim ocx As Long, ocy As Long, ocw As Long, och As Long
@@ -320,13 +320,13 @@ Public TopPage As Boolean
             
             If alpha < 0 Then alpha = 0
             If alpha > 1 Then alpha = 1
-            With B
+            With b
                 .AlphaFormat = &H1
                 .BlendFlags = &H0
                 .BlendOp = 0
                 .SourceConstantAlpha = Int(alpha * 255)
             End With
-            CopyMemory bl, B, 4
+            CopyMemory bl, b, 4
         End If
         
         If TypeName(n) = "String" Then
@@ -349,7 +349,7 @@ Public TopPage As Boolean
         
         If ScrollMode Then
             OX = OX + ScrollX + ScrollBX: OY = OY + ScrollY + ScrollBY
-            Dim ret As Long, Crect As RECT
+            Dim Ret As Long, Crect As RECT
             With Crect
                 .Left = OX: .top = OY: .Right = OX + ocw: .Bottom = OY + och
             End With
@@ -412,9 +412,9 @@ Public TopPage As Boolean
         
         If ScrollMode Then
             OX = OX + ScrollX + ScrollBX: OY = OY + ScrollY + ScrollBY
-            Dim ret As Long
-            GdipIsVisibleRect GG, OX, OY, w, h, ret
-            If ret = 0 Then OutOfScroll = True: Exit Sub
+            Dim Ret As Long
+            GdipIsVisibleRect GG, OX, OY, w, h, Ret
+            If Ret = 0 Then OutOfScroll = True: Exit Sub
         End If
         
         If animation <> 0 Then
@@ -469,9 +469,9 @@ Public TopPage As Boolean
         
         If ScrollMode Then
             X = X + ScrollX + ScrollBX: y = y + ScrollY + ScrollBY
-            Dim ret As Long
-            GdipIsVisibleRect GG, IIf(X1 < X2, X1, X2), IIf(Y1 < Y2, Y1, Y2), IIf(X1 < X2, X2 - X1, X1 - X2), IIf(Y1 < Y2, Y2 - Y1, Y1 - Y2), ret
-            If Not ret Then OutOfScroll = True: Exit Sub
+            Dim Ret As Long
+            GdipIsVisibleRect GG, IIf(X1 < X2, X1, X2), IIf(Y1 < Y2, Y1, Y2), IIf(X1 < X2, X2 - X1, X1 - X2), IIf(Y1 < Y2, Y2 - Y1, Y1 - Y2), Ret
+            If Not Ret Then OutOfScroll = True: Exit Sub
         End If
         
         If animation <> 0 Then
@@ -529,9 +529,9 @@ Public TopPage As Boolean
         
         If ScrollMode Then
             OX = OX + ScrollX + ScrollBX: OY = OY + ScrollY + ScrollBY
-            Dim ret As Long
-            GdipIsVisibleRect GG, OX - 1, OY - 1, ow, oh, ret
-            If Not ret Then OutOfScroll = True: Exit Sub
+            Dim Ret As Long
+            GdipIsVisibleRect GG, OX - 1, OY - 1, ow, oh, Ret
+            If Not Ret Then OutOfScroll = True: Exit Sub
         End If
         
         If animation <> 0 Then
@@ -628,9 +628,9 @@ ReShape:
         
         If ScrollMode Then
             OX = OX + ScrollX + ScrollBX: OY = OY + ScrollY + ScrollBY
-            Dim ret As Long
-            GdipIsVisibleRect GG, OX - 1, OY - 1, ow, oh, ret
-            If Not ret Then OutOfScroll = True: Exit Sub
+            Dim Ret As Long
+            GdipIsVisibleRect GG, OX - 1, OY - 1, ow, oh, Ret
+            If Not Ret Then OutOfScroll = True: Exit Sub
         End If
         
         If animation <> 0 Then
@@ -791,13 +791,13 @@ ReShape:
         
         NewAnimation = UBound(Anis)
     End Function
-    Public Sub StartAnimation(id As Integer, Optional delay As Long = 0)
-        Anis(id).Start = GetTickCount
-        Anis(id).delay = delay
-        Anis(id).mark = False
+    Public Sub StartAnimation(ID As Integer, Optional delay As Long = 0)
+        Anis(ID).Start = GetTickCount
+        Anis(ID).delay = delay
+        Anis(ID).mark = False
     End Sub
-    Public Function AnimationDone(id As Integer) As Boolean
-        AnimationDone = Anis(id).mark
+    Public Function AnimationDone(ID As Integer) As Boolean
+        AnimationDone = Anis(ID).mark
     End Function
 '========================================================
     'Control
@@ -868,7 +868,7 @@ ReShape:
             End If
         End If
         
-        If Mouse.State = 2 And m = 0 Then TextHandle = 0: m = 4
+        If Mouse.state = 2 And m = 0 Then TextHandle = 0: m = 4
         
         ShowEdit = m
         

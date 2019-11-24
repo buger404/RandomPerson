@@ -49,7 +49,7 @@ Dim Hwnd As Long, mRate As Long, mVolume As Single
 '========================================================
 '   Init
     Private Sub Class_Initialize()
-        mVolume = 0.5: mRate = 1
+        mVolume = 0.2: mRate = 1
     End Sub
     Public Sub Create(ByVal path As String)
         If Not BassInstalled Then
@@ -84,16 +84,16 @@ Dim Hwnd As Long, mRate As Long, mVolume As Single
 '   MusicMap
     Function GetMusicMap() As Single()
         On Error Resume Next
-        Dim i As Long, di As Long, j As Long, returns(512) As Single
+        Dim I As Long, di As Long, j As Long, returns(512) As Single
         Dim tmp As Long
         
         If BASS_ChannelIsActive(Hwnd) <> BASS_ACTIVE_PLAYING Then Exit Function
         
         Call BASS_ChannelGetData(Hwnd, FFTData(0), BASS_DATA_FFT1024)
         
-        For i = 0 To UBound(FFTData) - 1
-            di = Int(Abs(FFTData(i)) * 7500)
-            j = i Mod 129
+        For I = 0 To UBound(FFTData) - 1
+            di = Int(Abs(FFTData(I)) * 7500)
+            j = I Mod 129
             If di > 1500 Then di = 1500
             If di >= FFTPeacks(j) Then
                 FFTPeacks(j) = di
@@ -107,7 +107,7 @@ Dim Hwnd As Long, mRate As Long, mVolume As Single
             End If
             If (1500 - FFTPeacks(j)) > 1500 Then FFTPeacks(j) = 0
             If (1500 - FFTFallOff(j)) > 1500 Then FFTFallOff(j) = 0
-            returns(i) = FFTFallOff(j)
+            returns(I) = FFTFallOff(j)
         Next
         GetMusicMap = returns
     End Function
