@@ -4,14 +4,14 @@ Begin VB.Form GameWindow
    BackColor       =   &H80000005&
    BorderStyle     =   0  'None
    Caption         =   "抽奖"
-   ClientHeight    =   6675
-   ClientLeft      =   15
-   ClientTop       =   15
+   ClientHeight    =   6684
+   ClientLeft      =   12
+   ClientTop       =   12
    ClientWidth     =   9660
    LinkTopic       =   "Form1"
-   ScaleHeight     =   445
+   ScaleHeight     =   557
    ScaleMode       =   3  'Pixel
-   ScaleWidth      =   644
+   ScaleWidth      =   805
    ShowInTaskbar   =   0   'False
    StartUpPosition =   2  '屏幕中心
    Begin VB.Timer DrawTimer 
@@ -79,31 +79,34 @@ Private Sub Form_Load()
         Set ReportPage = New ReportPage
     '=============================================
 
+    HideLOGO = 1
+    DisableLOGO = 1
+    
     '设置活动页面
     EC.ActivePage = "FlyPage"
     
-    SetWindowPos Me.Hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE Or SWP_NOSIZE
+    If App.LogMode <> 0 Then SetWindowPos Me.Hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE Or SWP_NOSIZE
     Student = ReadExcel(App.path & "\Person.xls")
     Call Start
     Piano.Init
 End Sub
 
-Private Sub Form_MouseDown(button As Integer, Shift As Integer, X As Single, y As Single)
+Private Sub Form_MouseDown(button As Integer, Shift As Integer, X As Single, Y As Single)
     '发送鼠标信息
-    UpdateMouse X, y, 1, button
+    UpdateMouse X, Y, 1, button
 End Sub
 
-Private Sub Form_MouseMove(button As Integer, Shift As Integer, X As Single, y As Single)
+Private Sub Form_MouseMove(button As Integer, Shift As Integer, X As Single, Y As Single)
     '发送鼠标信息
     If Mouse.state = 0 Then
-        UpdateMouse X, y, 0, button
+        UpdateMouse X, Y, 0, button
     Else
-        Mouse.X = X: Mouse.y = y
+        Mouse.X = X: Mouse.Y = Y
     End If
 End Sub
-Private Sub Form_MouseUp(button As Integer, Shift As Integer, X As Single, y As Single)
+Private Sub Form_MouseUp(button As Integer, Shift As Integer, X As Single, Y As Single)
     '发送鼠标信息
-    UpdateMouse X, y, 2, button
+    UpdateMouse X, Y, 2, button
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)

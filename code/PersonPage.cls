@@ -20,14 +20,20 @@ Attribute VB_Exposed = False
         XDir As Long
         YDir As Long
         alpha As Single
+        Text As String
+        Index As Integer
     End Type
     Dim Balls() As NoteBall
 '======================================
-Public Sub CreateBalls(index As Integer)
+Public Sub CreateBalls(Index As Integer)
     Dim WCount As Long, HCount As Long, MaxW As Long, MaxH As Long
     WCount = Int(RGW / (400 + 50))
     HCount = Int(RGH / (220 + 50))
     MaxH = Int(UBound(Person) / WCount) + 1
+    Dim IIndex As Integer
+    Randomize
+    IIndex = Int(Rnd * 8)
+    If IIndex > 7 Then IIndex = 7
     
     For I = 0 To UBound(Person)
         MaxW = IIf(UBound(Person) + 1 > WCount, IIf(Int(I / WCount) < Int(UBound(Person) / WCount), WCount, (UBound(Person) Mod WCount) + 1), UBound(Person) + 1)
@@ -36,11 +42,12 @@ Public Sub CreateBalls(index As Integer)
         For j = 1 To 4
             ReDim Preserve Balls(UBound(Balls) + 1)
             With Balls(UBound(Balls))
-                .X = BoxX - 48 * 3 / 2 + 48 * index
+                .X = BoxX - 48 * 3 / 2 + 48 * Index
                 .y = BoxY
                 .alpha = 1
                 .XDir = (Int(Rnd * 10) + 5) * IIf(Int(Rnd * 2) = 1, 1, -1)
                 .YDir = (Int(Rnd * 10) + 5) * IIf(Int(Rnd * 2) = 1, 1, -1)
+                .Index = IIndex
             End With
         Next
     Next
@@ -144,15 +151,21 @@ Public Sub Update()
     Next
     
     For I = 1 To UBound(Balls)
-        If I > UBound(Balls) Then Exit For
 NextBall:
+        If I > UBound(Balls) Then Exit For
+        If I < 1 Then Exit For
         Balls(I).X = Balls(I).X + Balls(I).XDir
         Balls(I).y = Balls(I).y + Balls(I).YDir
         Balls(I).XDir = Balls(I).XDir * 1.1
         Balls(I).YDir = Balls(I).YDir * 1.1
         Balls(I).alpha = Balls(I).alpha - 0.03
-        Page.DrawImage "note.png", Balls(I).X, Balls(I).y, alpha:=Balls(I).alpha, pos:=posOnCenter
-        If Balls(I).X < 0 Or Balls(I).y < 0 Or Balls(I).X > RGW Or Balls(I).y > RGH Then
+        If Balls(I).alpha < 0 Then Balls(I).alpha = 0
+        If Balls(I).Text = "" Then
+            Page.DrawImage "note" & Balls(I).Index & ".png", Balls(I).X, Balls(I).y, alpha:=Balls(I).alpha, pos:=posOnCenter
+        Else
+            Page.Writes Balls(I).Text, Balls(I).X, Balls(I).y, 24, argb(Balls(I).alpha * 255, 255, 0, 0), align:=StringAlignmentCenter
+        End If
+        If Balls(I).X < 0 Or Balls(I).y < 0 Or Balls(I).X > RGW Or Balls(I).y > RGH Or Balls(I).alpha <= 0 Then
             Balls(I) = Balls(UBound(Balls))
             ReDim Preserve Balls(UBound(Balls) - 1)
             I = I - 1
@@ -160,7 +173,20 @@ NextBall:
         End If
     Next
     
-    If Mouse.state = 2 Then ECore.NewTransform , , "MainPage"
+    If Mouse.state = 2 Then
+        If pro >= 1 Then
+            ECore.NewTransform , , "MainPage"
+        Else
+            ReDim Preserve Balls(UBound(Balls) + 1)
+            With Balls(UBound(Balls))
+                .X = Mouse.X
+                .y = Mouse.y - 12
+                .Text = "别急，还没抽完哦~"
+                .alpha = 1
+                .YDir = -1.5
+            End With
+        End If
+    End If
 End Sub
 Public Sub Wheel(Direction As Integer, Depth As Single)
     '鼠标滚轮事件
@@ -190,7 +216,7 @@ Private Sub Class_Initialize()
     Set Page = New GPage
     Page.Create Me
     '导入游戏资源
-    Page.Res.NewImages App.path & "\assets"
+    Page.Res.NewImages App.path & "\assets", 1.3
     '创建页面
     ECore.Add Page, "PersonPage"
     ReDim Balls(0)

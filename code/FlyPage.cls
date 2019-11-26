@@ -31,7 +31,6 @@ Public Sub Update()
     Page.DrawImage "image.png", IX, IY, alpha:=1, pos:=posOnCenter
 
     If CheckMouse2 >= mMouseDown Then
-        MusicList.Play "Option.wav"
         Dim p As POINTAPI
         GetCursorPos p
         If sx = -1 Then
@@ -41,7 +40,10 @@ Public Sub Update()
                 IX = p.X - sx: IY = p.y - sy
                 ECore.Display: DoEvents
             Loop
-            If Abs(OX - IX) < 10 And Abs(OY - IY) < 10 Then ECore.NewTransform transFadeIn, , "MainPage"
+            If Abs(OX - IX) < 10 And Abs(OY - IY) < 10 Then
+                MusicList.Play "Option.wav"
+                ECore.NewTransform transFadeIn, , "MainPage"
+            End If
             sx = -1
         End If
     End If
@@ -77,8 +79,8 @@ Private Sub Class_Initialize()
     Page.Res.NewImages App.path & "\assets\window", 0.7
     '创建页面
     ECore.Add Page, "FlyPage"
-    IX = RGW - 90
-    IY = RGH - 90
+    IX = RGW - 100
+    IY = RGH - 150
     sx = -1
     '===============================================
     '   如果需要添加动画，请放置在此处

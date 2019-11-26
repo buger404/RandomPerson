@@ -183,7 +183,7 @@ NoClear:
         End If
         tFPS = tFPS + 1: FPSctt = FPSctt + (Timer * 1000 - t)
         
-        If Mouse.State = 2 Then Mouse.State = 0
+        If Mouse.state = 2 Then Mouse.state = 0
         
     End Sub
 '========================================================

@@ -19,7 +19,68 @@ Attribute VB_Name = "Randoms"
     Public Beeps(3) As Boolean
     Public CloseSnd As Boolean
     Public ReportTime As Long
+    Public AntiDouble(62) As Boolean
 '=====================================================================================
+Public Function IsInClass(TimeShift As Long) As Boolean
+    Dim DTime As Long, Ret As Boolean, NowTime As Long
+    DTime = TimeShift
+    'DTime = Hour(Now) * 60 + Minute(Now)
+    
+    '早读
+    NowTime = (7 * 60) + 20
+    If DTime >= NowTime - 3 And DTime < NowTime + 40 Then Ret = True
+    '第一节课
+    NowTime = NowTime + 5 + 20
+    If DTime >= NowTime - 2 And DTime < NowTime + 40 Then Ret = True
+    '第二节课
+    NowTime = NowTime + 10 + 40
+    If DTime >= NowTime - 2 And DTime < NowTime + 40 Then Ret = True
+    '第三节课（大课间）
+    NowTime = NowTime + IIf(Weekday(Now) = 6, 10, 25) + 40
+    If DTime >= NowTime - 2 And DTime < NowTime + 40 Then Ret = True
+    '第四节课
+    NowTime = NowTime + 10 + 40
+    If DTime >= NowTime - 2 And DTime < NowTime + 40 Then Ret = True
+    '第五节课（限时训练）
+    NowTime = NowTime + 10 + 40
+    If DTime >= NowTime - 2 And DTime < NowTime + 40 Then Ret = True
+    
+    '下午
+    '午休
+    NowTime = (14 * 60) + 0
+    If DTime >= NowTime And DTime < NowTime + 20 Then Ret = True
+    '第一节课
+    NowTime = (14 * 60) + 20
+    If DTime >= NowTime - 3 And DTime < NowTime + 40 Then Ret = True
+    '第二节课
+    NowTime = NowTime + 10 + 40
+    If DTime >= NowTime - 2 And DTime < NowTime + 40 Then Ret = True
+    '第三节课
+    NowTime = NowTime + 10 + 40
+    If DTime >= NowTime - 2 And DTime < NowTime + 40 Then Ret = True
+    '第四节课（限时训练）
+    NowTime = NowTime + 10 + 40
+    If DTime >= NowTime - 2 And DTime < NowTime + 40 Then Ret = True
+    
+    '晚自习
+    '第一节课
+    NowTime = (18 * 60) + 20
+    If DTime >= NowTime - 3 And DTime < NowTime + 40 Then Ret = True
+    '第二节课
+    NowTime = NowTime + 10 + 40
+    If DTime >= NowTime - 2 And DTime < NowTime + 50 Then Ret = True
+    '第三节课
+    NowTime = NowTime + 10 + 50
+    If DTime >= NowTime - 2 And DTime < NowTime + 50 Then Ret = True
+    '第四节课（公共自习）
+    NowTime = NowTime + 10 + 50
+    If DTime >= NowTime - 2 And DTime < NowTime + 50 Then Ret = True
+    '晚自习下课
+    NowTime = NowTime + 50
+    If DTime >= NowTime And DTime < NowTime + 20 Then Ret = True
+    
+    IsInClass = Ret Or (App.LogMode = 0)
+End Function
 Public Sub Speak(ByVal Content As String)
     If CloseSnd Then Exit Sub
     If Not Voice Is Nothing Then Voice.Speak Content, 1          '参数1表示异步播放
@@ -43,6 +104,7 @@ End Sub
 Public Sub StartRandom()
     RandomDone = False
     MusicList.Play "Done.mp3"
+    Erase AntiDouble
 End Sub
 Public Function GetRandom(Filter As Integer) As Integer
     '摇号准备
@@ -51,7 +113,7 @@ Public Function GetRandom(Filter As Integer) As Integer
     For I = 1 To 62
         If I <> 39 Then '张亦佳
             '没有被忽略
-            If (Not Ignored(I)) Or JustRandom Then
+            If ((Not Ignored(I)) Or JustRandom) And AntiDouble(I) = False Then
                 If Filter = 1 And Student(3, I - 1) = "男" Then GoTo SkipThis
                 If Filter = 2 And Student(3, I - 1) = "女" Then GoTo SkipThis
                 ReDim Preserve Sticks(UBound(Sticks) + 1)
@@ -77,6 +139,8 @@ Miss:
     End If
     
     IgnoredSomebody RIndex + 1
+    AntiDouble(RIndex + 1) = True
+    
     GetRandom = RIndex
 End Function
 Public Sub DoneRandom()
@@ -91,21 +155,38 @@ Public Sub DoneRandom()
     If Bing Then MusicList.Play "LevelUp.mp3"
     Speak "恭喜" & Ret
 End Sub
+Public Sub CheckIgnored(Filter As Integer, Needed As Long)
+    Dim Check As Boolean, Count As Long
+    Count = Needed
+    For I = 1 To 62
+        If I <> 39 Then '张亦佳
+            If Not Ignored(I) Then
+                Check = True
+                If Filter = 1 Then Check = Check And (Student(3, I - 1) = "男")
+                If Filter = 2 Then Check = Check And (Student(3, I - 1) = "女")
+                If Check Then Count = Count - 1
+            End If
+        End If
+    Next
+    If Count > 0 Then
+        '不够抽，需要擦除
+        For I = 1 To 62
+            If I <> 39 Then '张亦佳
+                Check = True
+                If Filter = 1 Then Check = Check And (Student(3, I - 1) = "男")
+                If Filter = 2 Then Check = Check And (Student(3, I - 1) = "女")
+                If Check Then Ignored(I) = False
+            End If
+        Next
+        Open App.path & "\ignored.stulist" For Binary As #1
+        Put #1, , Ignored
+        Close #1
+    End If
+End Sub
 Public Sub IgnoredSomebody(index As Integer)
     '忽略某人
     Ignored(index) = True
     RCount(index) = RCount(index) + 1
-    '判断是否已经全部忽略
-    Dim AllIgnoreBoy As Boolean, AllIgnoreGirl As Boolean
-    AllIgnoreBoy = True: AllIgnoreGirl = True
-    For I = 1 To 62
-        If I <> 39 Then '张亦佳
-            If (Not Ignored(I)) And Student(3, I - 1) = "男" Then AllIgnoreBoy = False: Exit For
-            If (Not Ignored(I)) And Student(3, I - 1) = "女" Then AllIgnoreGirl = False: Exit For
-        End If
-    Next
-    '如果已经全部忽略
-    If AllIgnoreBoy Or AllIgnoreGirl Then Erase Ignored()
     '存入文件
     Open App.path & "\ignored.stulist" For Binary As #1
     Put #1, , Ignored

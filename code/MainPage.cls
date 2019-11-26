@@ -32,7 +32,7 @@ Public Sub Update()
     '   Page.Writes "我是文字", 20,20, Color:=argb(255, 0, 0, 0)
     '================================================================
     Page.Writes "高一五班专属摇号机", RGW / 2, RGH / 2 - 90, 24, argb(255, 255, 255, 255), align:=StringAlignmentCenter
-    Page.Writes "Version 3.0.0", RGW / 2, RGH / 2 - 50, 18, argb(150, 255, 255, 255), align:=StringAlignmentCenter
+    Page.Writes "Version 3.3.0", RGW / 2, RGH / 2 - 50, 18, argb(210, 255, 255, 255), align:=StringAlignmentCenter
     
     Page.Writes "摇号方式", RGW / 2 - 250, RGH / 2 + 50, 18, argb(255, 0, 0, 0)
     Dim Ops(2) As String
@@ -52,6 +52,13 @@ Public Sub Update()
     If CheckMouse2 = mMouseUp And RandomPerson < RandomMax - 1 Then RandomPerson = RandomPerson + 1
     Page.Writes "+", RGW / 2 - 72 + 5 + 4, RGH / 2 + 100, 18, IIf(RandomPerson < RandomMax - 1, argb(255, 255, 255, 255), argb(255, 32, 32, 32))
     
+    Page.Writes "这是？->", RGW / 2 + 98 - 85, RGH / 2 + 100, 18, argb(255, 51, 203, 186), 85, 25, style:=FontStyleUnderline
+    If CheckMouse2 = mMouseUp Then
+        SetWindowPos GameWindow.Hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE Or SWP_NOSIZE
+        MsgBox "“只凭运气” 说明：" & vbCrLf & "* 默认为关闭。关闭时，当一个人被抽中一次后，在另外的60个人被抽中之前，该人不会再被抽中。" & vbCrLf & vbCrLf & "* 若开启，摇号则全靠运气，这也意味着同一个人可能会被连续抽中两次。", 48, "关于"
+        SetWindowPos GameWindow.Hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE Or SWP_NOSIZE
+    End If
+    
     Page.Writes "只凭运气：" & IIf(JustRandom, "开", "关"), RGW / 2 + 98, RGH / 2 + 100, 18, IIf(JustRandom, argb(255, 51, 203, 186), argb(255, 0, 0, 0)), 150, 25
     If CheckMouse2 = mMouseUp Then
         MusicList.Play "Option.wav"
@@ -63,21 +70,27 @@ Public Sub Update()
         CloseSnd = Not CloseSnd
     End If
     
-    Page.Writes "About", RGW / 2 - 280, RGH / 2 - 275, 18, argb(150, 255, 255, 255), 100, 25, StringAlignmentCenter
+    Page.Writes "About", RGW / 2 - 280, RGH / 2 - 275, 18, argb(210, 255, 255, 255), 100, 25, StringAlignmentCenter
     If CheckMouse2 = mMouseUp Then
-        MsgBox "高一五班专属摇号机" & vbCrLf & "版本号：3.0.0" & vbCrLf & vbCrLf & "Copyright 2019 CZY&LSM all rights reserved .", 48, "关于"
+        SetWindowPos GameWindow.Hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE Or SWP_NOSIZE
+        MsgBox "高一五班专属摇号机" & vbCrLf & "版本号：3.3.0" & vbCrLf & "制作：陈志琰 刘思敏" & vbCrLf & vbCrLf & "Copyright 2019 高一五班 all rights reserved .", 48, "关于"
+        SetWindowPos GameWindow.Hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE Or SWP_NOSIZE
     End If
     
-    Page.Writes "Hide", RGW / 2 + 185, RGH / 2 - 275, 18, argb(150, 255, 255, 255), 100, 25, StringAlignmentCenter
+    Page.Writes "Hide", RGW / 2 + 185, RGH / 2 - 275, 18, argb(210, 255, 255, 255), 100, 25, StringAlignmentCenter
     If CheckMouse2 = mMouseUp Then ECore.NewTransform transFadeIn, , "FlyPage"
     
-    Page.Writes "Report", RGW / 2 + 105, RGH / 2 - 275, 18, argb(150, 255, 255, 255), 80, 25, StringAlignmentCenter
+    Page.Writes "Report", RGW / 2 + 105, RGH / 2 - 275, 18, argb(210, 255, 255, 255), 80, 25, StringAlignmentCenter
     If CheckMouse2 = mMouseUp Then ECore.NewTransform transFadeIn, , "ReportPage"
     
-    Page.DrawImage "go.png", RGW / 2, RGH / 2 + 200, alpha:=1, pos:=posOnCenter
-    If CheckMouse2 = mMouseUp Then
+    Dim Forbidden As Boolean
+    Forbidden = (IsInClass(Hour(Now) * 60 + Minute(Now)) = False)
+    
+    Page.DrawImage IIf(Forbidden, "no", "") & "go.png", RGW / 2, RGH / 2 + 200, alpha:=1, pos:=posOnCenter
+    If CheckMouse2 = mMouseUp And Forbidden = False Then
         RandomTime = GetTickCount
         Erase Beeps
+        Call CheckIgnored(RandomStyle, RandomPerson + 1)
         Call StartRandom
         ClickTime = GetTickCount: Clicked = True
         ReDim Person(RandomPerson)
