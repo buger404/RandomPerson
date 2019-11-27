@@ -126,11 +126,11 @@ SkipThis:
     Randomize
 Miss:
     '+1是因为Sticks(0)=0，顺便防止抽到62号的几率过小
-    Dim index As Integer
-    index = Int(Rnd * UBound(Sticks) + 1)
+    Dim Index As Integer
+    Index = Int(Rnd * UBound(Sticks) + 1)
     '防止下标越界
-    If index > UBound(Sticks) Then index = UBound(Sticks)
-    RIndex = Sticks(index) - 1
+    If Index > UBound(Sticks) Then Index = UBound(Sticks)
+    RIndex = Sticks(Index) - 1
     
     If Rnd < Val(Student(2, RIndex)) Then
         '闪避成功
@@ -162,8 +162,8 @@ Public Sub CheckIgnored(Filter As Integer, Needed As Long)
         If I <> 39 Then '张亦佳
             If Not Ignored(I) Then
                 Check = True
-                If Filter = 1 Then Check = Check And (Student(3, I - 1) = "男")
-                If Filter = 2 Then Check = Check And (Student(3, I - 1) = "女")
+                If Filter = 1 Then Check = Check And (Student(3, I - 1) = "女")
+                If Filter = 2 Then Check = Check And (Student(3, I - 1) = "男")
                 If Check Then Count = Count - 1
             End If
         End If
@@ -173,8 +173,8 @@ Public Sub CheckIgnored(Filter As Integer, Needed As Long)
         For I = 1 To 62
             If I <> 39 Then '张亦佳
                 Check = True
-                If Filter = 1 Then Check = Check And (Student(3, I - 1) = "男")
-                If Filter = 2 Then Check = Check And (Student(3, I - 1) = "女")
+                If Filter = 1 Then Check = Check And (Student(3, I - 1) = "女")
+                If Filter = 2 Then Check = Check And (Student(3, I - 1) = "男")
                 If Check Then Ignored(I) = False
             End If
         Next
@@ -183,10 +183,10 @@ Public Sub CheckIgnored(Filter As Integer, Needed As Long)
         Close #1
     End If
 End Sub
-Public Sub IgnoredSomebody(index As Integer)
+Public Sub IgnoredSomebody(Index As Integer)
     '忽略某人
-    Ignored(index) = True
-    RCount(index) = RCount(index) + 1
+    Ignored(Index) = True
+    RCount(Index) = RCount(Index) + 1
     '存入文件
     Open App.path & "\ignored.stulist" For Binary As #1
     Put #1, , Ignored

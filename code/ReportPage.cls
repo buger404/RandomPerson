@@ -51,9 +51,21 @@ Public Sub Update()
     
     For I = 1 To 62
         Page.Paint 0, w * (I - 1), RGH - 200, w + 1, RCount(I) * pro / max * (RGH / 2), argb(RCount(I) * pro / max * 255, 51, 203, 186), pos:=posOnBottom
+        If CheckMouse2 = mMouseUp Then
+            SetWindowPos GameWindow.Hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE Or SWP_NOSIZE
+            MsgBox Student(0, I - 1) & " 摇号报告" & vbCrLf & _
+                   "性别：" & Student(3, I - 1) & vbCrLf & _
+                   "座号：" & Student(1, I - 1) & vbCrLf & _
+                   "闪避加成：" & Val(Student(2, I - 1)) * 100 & "%" & vbCrLf & _
+                   "等级：" & Int(RCount(I) / 5) & vbCrLf & _
+                   "累计抽中次数：" & RCount(I) & vbCrLf & _
+                   "抽中次数与平均抽中次数的比值：" & Int(RCount(I) / Pitch * 1000) / 1000 & "%" & vbCrLf & _
+                   "本轮是否已经被抽中：" & IIf(Ignored(I), "是，在剩余的人抽完之前不会再被抽中。", "否，当心。你可能会被抽中。") & vbCrLf & _
+                   "抽中概率：" & Int(RCount(I) / Total * 1000) / 1000 & "%", 48, "报告"
+            SetWindowPos GameWindow.Hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE Or SWP_NOSIZE
+        End If
         Page.Writes Student(0, I - 1), w * (I - 1), RGH - 200, 24, argb(RCount(I) * pro / max * 255, 255, 255, 255), w + 1, 200, StringAlignmentCenter, FontStyleBold
         Page.Writes Int(RCount(I) * pro), w * (I - 1), RGH - 200 - RCount(I) / max * (RGH / 2) * pro - 30, 16, argb(255, 255, 255, 255), w + 1, 30, align:=StringAlignmentCenter, style:=FontStyleBold
-        Page.Writes "概率" & vbCrLf & Int(RCount(I) / Total * 100) & "%", w * (I - 1), RGH - 200 - RCount(I) / max * (RGH / 2) * pro - 30 - 60, 14, argb(255, 255, 255, 255), w + 1, 60, align:=StringAlignmentCenter, style:=FontStyleBold
     Next
     Page.Paint 0, 0, RGH - 200 - Pitch / max * (RGH / 2), RGW + 1, 10, argb(100, 255, 255, 255)
     Page.Writes "平均" & Int(Pitch) & "次", RGW / 2, RGH - 200 - Pitch / max * (RGH / 2) + 10, 24, argb(255, 255, 255, 255), align:=StringAlignmentCenter
@@ -98,3 +110,4 @@ Private Sub Class_Initialize()
     
     '===============================================
 End Sub
+

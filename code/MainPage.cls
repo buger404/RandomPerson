@@ -32,7 +32,7 @@ Public Sub Update()
     '   Page.Writes "我是文字", 20,20, Color:=argb(255, 0, 0, 0)
     '================================================================
     Page.Writes "高一五班专属摇号机", RGW / 2, RGH / 2 - 90, 24, argb(255, 255, 255, 255), align:=StringAlignmentCenter
-    Page.Writes "Version 3.3.0", RGW / 2, RGH / 2 - 50, 18, argb(210, 255, 255, 255), align:=StringAlignmentCenter
+    Page.Writes "Version 3.4.0", RGW / 2, RGH / 2 - 50, 18, argb(210, 255, 255, 255), align:=StringAlignmentCenter
     
     Page.Writes "摇号方式", RGW / 2 - 250, RGH / 2 + 50, 18, argb(255, 0, 0, 0)
     Dim Ops(2) As String
@@ -70,17 +70,17 @@ Public Sub Update()
         CloseSnd = Not CloseSnd
     End If
     
-    Page.Writes "About", RGW / 2 - 280, RGH / 2 - 275, 18, argb(210, 255, 255, 255), 100, 25, StringAlignmentCenter
+    Page.Writes "关于作者", RGW / 2 - 280, RGH / 2 - 285, 18, argb(210, 255, 255, 255), 100, 25, StringAlignmentCenter
     If CheckMouse2 = mMouseUp Then
         SetWindowPos GameWindow.Hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE Or SWP_NOSIZE
-        MsgBox "高一五班专属摇号机" & vbCrLf & "版本号：3.3.0" & vbCrLf & "制作：陈志琰 刘思敏" & vbCrLf & vbCrLf & "Copyright 2019 高一五班 all rights reserved .", 48, "关于"
+        MsgBox "高一五班专属摇号机" & vbCrLf & "版本号：3.4.0" & vbCrLf & "制作：陈志琰 刘思敏" & vbCrLf & vbCrLf & "Copyright 2019 高一五班 all rights reserved .", 48, "关于"
         SetWindowPos GameWindow.Hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE Or SWP_NOSIZE
     End If
     
-    Page.Writes "Hide", RGW / 2 + 185, RGH / 2 - 275, 18, argb(210, 255, 255, 255), 100, 25, StringAlignmentCenter
+    Page.Writes "隐藏", RGW / 2 + 185, RGH / 2 - 285, 18, argb(210, 255, 255, 255), 100, 25, StringAlignmentCenter
     If CheckMouse2 = mMouseUp Then ECore.NewTransform transFadeIn, , "FlyPage"
     
-    Page.Writes "Report", RGW / 2 + 105, RGH / 2 - 275, 18, argb(210, 255, 255, 255), 80, 25, StringAlignmentCenter
+    Page.Writes "报告", RGW / 2 + 105, RGH / 2 - 285, 18, argb(210, 255, 255, 255), 80, 25, StringAlignmentCenter
     If CheckMouse2 = mMouseUp Then ECore.NewTransform transFadeIn, , "ReportPage"
     
     Dim Forbidden As Boolean
